@@ -1,6 +1,3 @@
-# coding: utf-8
-# license: GPLv3
-
 from solar_objects import Star, Planet
 
 
@@ -9,20 +6,23 @@ def read_space_objects_data_from_file(input_filename):
     и вызывает создание их графических образов
 
     Параметры:
-
     **input_filename** — имя входного файла
     """
-
     objects = []
     with open(input_filename) as input_file:
         for line in input_file:
             if len(line.strip()) == 0 or line[0] == '#':
                 continue  # пустые строки и строки-комментарии пропускаем
             object_type = line.split()[0].lower()
+            line=line.split()
             if object_type == "star":  # FIXME: do the same for planet
                 star = Star()
                 parse_star_parameters(line, star)
                 objects.append(star)
+            elif object_type == "planet":
+                planet = Planet()
+                parse_planet_parameters(line, planet)
+                objects.append(planet)
             else:
                 print("Unknown space object")
 
@@ -43,8 +43,19 @@ def parse_star_parameters(line, star):
     **line** — строка с описание звезды.
     **star** — объект звезды.
     """
-
-    pass  # FIXME: not done yet
+    star.r = read(line[1])
+    star.color = line[2]
+    star.m = read(line[3])
+    star.y = read(line[5])
+    star.x = read(line[4])
+    star.vy = read(line[7])
+    star.vx = read(line[6])
+                    # FIXME: not done yet
+def read(str):
+    if 'E' in str:
+        str = str.split('E')
+        return float(str[0])*10**int(str[1])
+    return float(str)
 
 def parse_planet_parameters(line, planet):
     """Считывает данные о планете из строки.
@@ -61,7 +72,15 @@ def parse_planet_parameters(line, planet):
     **line** — строка с описание планеты.
     **planet** — объект планеты.
     """
-    pass  # FIXME: not done yet...
+    planet.r = read(line[1])
+    planet.color = line[2]
+    planet.m = read(line[3])
+    planet.y = read(line[5])
+    planet.x = read(line[4])
+    planet.vy = read(line[7])
+    planet.vx = read(line[6])
+
+                # FIXME: not done yet...
 
 
 def write_space_objects_data_to_file(output_filename, space_objects):
@@ -78,6 +97,7 @@ def write_space_objects_data_to_file(output_filename, space_objects):
     with open(output_filename, 'w') as out_file:
         for obj in space_objects:
             print(out_file, "%s %d %s %f" % ('1', 2, '3', 4.5))
+            out_file.write(f'{obj.type, obj.r, obj.color, obj.m, obj.x, obj.y, obj.vx, obj.vy}')
             # FIXME: should store real values
 
 # FIXME: хорошо бы ещё сделать функцию, сохранающую статистику в заданный файл...
